@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chúc mừng 20/10 - Ngày Phụ nữ Việt Nam 🌸</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Audio player (ẩn) -->
+    <audio id="bgMusic" loop></audio>
+
+    <!-- Screen 1: Intro -->
+    <div id="introScreen" class="screen active">
+        <div class="flowers-container" id="flowersContainer"></div>
+        
+        <div class="intro-content">
+            <h1 class="main-title">20 Tháng 10</h1>
+            <h2 class="sub-title">Ngày Phụ nữ Việt Nam</h2>
+            
+            <div class="intro-text">
+                <p>Ngày 20 tháng 10 là dịp để tôn vinh những người phụ nữ Việt Nam</p>
+                <p>Những người mẹ, người chị, người em, bạn gái của chúng ta</p>
+                <p>Những người luôn mạnh mẽ, dịu dàng và tràn đầy yêu thương</p>
+            </div>
+            
+            <button class="continue-btn" onclick="showGiftScreen()">
+                <span>Tiếp tục</span>
+                <div class="btn-glow"></div>
+            </button>
+        </div>
+    </div>
+
+    <!-- Screen 2: Gift Selection -->
+    <div id="giftScreen" class="screen">
+        <div class="gift-content">
+            <h2 class="gift-title">Chọn một món quà cho các bạn nữ nhé! 🎁</h2>
+            
+            <div class="gifts-container">
+                <div class="gift-box" onclick="openGift(this)">
+                    <div class="gift-wrap">
+                        <div class="gift-bow"></div>
+                        <div class="gift-body"></div>
+                    </div>
+                    <p>Quà số 1</p>
+                </div>
+                
+                <div class="gift-box" onclick="openGift(this)">
+                    <div class="gift-wrap">
+                        <div class="gift-bow"></div>
+                        <div class="gift-body"></div>
+                    </div>
+                    <p>Quà số 2</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Confetti container -->
+        <div id="confettiContainer"></div>
+    </div>
+
+    <!-- Screen 3: Main Display -->
+    <div id="mainScreen" class="screen">
+        <!-- Wishes Section (1/3 trên) -->
+        <div class="wishes-section">
+            <div class="wish-card">
+                <div class="wish-text" id="wishText">
+                    Chúc các bạn nữ luôn xinh đẹp và hạnh phúc! 🌸
+                </div>
+            </div>
+        </div>
+
+        <!-- Photos Rail Section (2/3 dưới) -->
+        <div class="photos-section">
+            <div class="photos-rail">
+                <div class="photos-track" id="photosTrack">
+                    <!-- Photos will be loaded here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Background decorations -->
+        <div class="bg-particles" id="bgParticles"></div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+    <!-- 🧠 Auto scroll xuống cuối khi mở quà (vô mainScreen) -->
+    <script>
+        // Hook lại hàm showMainScreen (nếu có sẵn)
+        const oldShowMainScreen = typeof showMainScreen === 'function' ? showMainScreen : null;
+
+        function showMainScreen() {
+            if (oldShowMainScreen) oldShowMainScreen();
+
+            // Chờ animation xong tí rồi cuộn xuống mượt
+            setTimeout(() => {
+                window.scrollTo({
+                    top: document.body.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }, 800); // delay cho nó khớp chuyển cảnh
+        }
+    </script>
+</body>
+</html>
