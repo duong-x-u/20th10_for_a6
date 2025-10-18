@@ -50,6 +50,38 @@ function showGiftScreen() {
 // ==================== GIFT SCREEN ====================
 function openGift(giftBox) {
     console.log('[DEBUG] openGift called.');
+
+    // Add screen shake effect
+    const giftScreen = document.getElementById('giftScreen');
+    giftScreen.style.animation = 'screenShake 0.5s ease-in-out';
+
+    // Add wave pulse effect around the gift
+    const wave = document.createElement('div');
+    wave.style.position = 'absolute';
+    wave.style.width = '400px';
+    wave.style.height = '400px';
+    wave.style.borderRadius = '50%';
+    wave.style.background = 'radial-gradient(circle, rgba(255,255,255,0.3) 0%, transparent 70%)';
+    wave.style.left = '50%';
+    wave.style.top = '50%';
+    wave.style.transform = 'translate(-50%, -50%)';
+    wave.style.animation = 'wavePulse 0.8s ease-out';
+    wave.style.pointerEvents = 'none';
+    wave.style.zIndex = '15';
+    giftScreen.appendChild(wave);
+
+    // Add flash effect
+    const flash = document.createElement('div');
+    flash.style.position = 'absolute';
+    flash.style.width = '100%';
+    flash.style.height = '100%';
+    flash.style.background = 'white';
+    flash.style.opacity = '0';
+    flash.style.animation = 'flash 0.3s ease-in-out';
+    flash.style.pointerEvents = 'none';
+    flash.style.zIndex = '20';
+    giftScreen.appendChild(flash);
+
     giftBox.classList.add('opening');
     createConfetti();
     const music = document.getElementById('bgMusic');
@@ -59,9 +91,8 @@ function openGift(giftBox) {
 
     setTimeout(() => {
         console.log('[DEBUG] Transitioning screens...');
-        const giftScreen = document.getElementById('giftScreen');
         const mainScreen = document.getElementById('mainScreen');
-        
+
         giftScreen.classList.remove('active');
         mainScreen.classList.add('active');
 
@@ -110,8 +141,8 @@ function initMainScreen() {
 
 function initBackgroundParticles() {
     const container = document.getElementById('bgParticles');
-    const particles = ['🌸', '🌺', '🌼', '🌻', '🌷', '🌹', '💐', '✨', '💖', '🎀'];
-    
+    const particles = ['🌸', '🌺', '🌼', '🌻', '🌷', '🌹', '💐', '✨', '💖', '🎀', '🌟', '💫', '⭐', '🌙', '☀️'];
+
     setInterval(() => {
         const particle = document.createElement('div');
         particle.className = 'particle';
@@ -119,13 +150,15 @@ function initBackgroundParticles() {
         particle.style.left = Math.random() * 100 + '%';
         particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
         particle.style.animationDelay = Math.random() * 2 + 's';
-        
+        particle.style.fontSize = (Math.random() * 20 + 15) + 'px'; // Vary size
+        particle.style.opacity = (Math.random() * 0.5 + 0.3); // Vary opacity
+
         container.appendChild(particle);
-        
+
         setTimeout(() => {
             particle.remove();
         }, 20000);
-    }, 800);
+    }, 500); // More frequent particles
 }
 
 // ==================== PHOTOS ====================
@@ -169,50 +202,173 @@ function loadPhotosIntoRail() {
         console.error('Photos track not found!');
         return;
     }
-    
+
     track.innerHTML = '';
-    
+
     // Always ensure we have photos
     if (!photos || photos.length === 0) {
         console.log('No photos available, generating placeholders...');
         photos = generatePlaceholderPhotos();
     }
-    
+
     console.log('Loading photos into rail:', photos.length);
-    
-    // Duplicate photos for seamless loop
-    const duplicatedPhotos = [...photos, ...photos];
-    
+
+    // Shuffle photos for random order each time
+    const shuffledPhotos = shuffleArray([...photos]);
+
+    // Duplicate shuffled photos for seamless loop
+    const duplicatedPhotos = [...shuffledPhotos, ...shuffledPhotos];
+
+    // Preload first few images for faster loading
+    preloadImages(duplicatedPhotos.slice(0, 5));
+
     duplicatedPhotos.forEach((photo, index) => {
         const photoItem = document.createElement('div');
         photoItem.className = 'photo-item';
-        
+
+        // Add particle trail effect
+        const particleTrail = document.createElement('div');
+        particleTrail.className = 'particle-trail';
+        particleTrail.style.position = 'absolute';
+        particleTrail.style.width = '100%';
+        particleTrail.style.height = '100%';
+        particleTrail.style.pointerEvents = 'none';
+        particleTrail.style.zIndex = '1';
+        photoItem.appendChild(particleTrail);
+
+        // Generate particles for trail
+        for (let i = 0; i < 5; i++) {
+            setTimeout(() => {
+                const particle = document.createElement('div');
+                particle.style.position = 'absolute';
+                particle.style.width = '4px';
+                particle.style.height = '4px';
+                particle.style.background = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7'][Math.floor(Math.random() * 5)];
+                particle.style.borderRadius = '50%';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.animation = `particleFloat ${1 + Math.random() * 2}s ease-out forwards`;
+                particleTrail.appendChild(particle);
+
+                setTimeout(() => particle.remove(), 3000);
+            }, i * 200);
+        }
+
+        // Add 3D tilt effect
+        photoItem.addEventListener('mousemove', (e) => {
+            const rect = photoItem.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / 10;
+            const rotateY = (centerX - x) / 10;
+
+            photoItem.style.transform = `translateY(var(--float, 0px)) rotate(var(--rotate, 0deg)) scale(var(--scale, 1)) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        });
+
+        photoItem.addEventListener('mouseleave', () => {
+            photoItem.style.transform = 'translateY(var(--float, 0px)) rotate(var(--rotate, 0deg)) scale(var(--scale, 1))';
+        });
+
+        // Firework burst when photo reaches center
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+                    createFireworkBurst(photoItem);
+                }
+            });
+        }, { threshold: 0.5 });
+        observer.observe(photoItem);
+
         if (photo.isPlaceholder) {
             // Create placeholder
             photoItem.style.background = `linear-gradient(135deg, ${photo.color}, ${adjustColor(photo.color, -20)})`;
-            photoItem.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: white; font-size: 4rem; font-weight: bold;">👧</div>`;
+            photoItem.innerHTML += `<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: white; font-size: 4rem; font-weight: bold;">👧</div>`;
         } else {
-            // Load actual photo
+            // Load actual photo with lazy loading
             const img = document.createElement('img');
             img.src = photo;
             img.alt = `Photo ${index + 1}`;
+            img.loading = 'lazy';  // Enable lazy loading
+            img.decoding = 'async';  // Async decoding for better performance
+            img.onload = function() {
+                img.classList.add('loaded');  // Add loaded class for fade-in effect
+            };
             img.onerror = function() {
                 // Fallback if image fails to load
                 console.log('Image failed to load:', photo);
                 photoItem.style.background = 'linear-gradient(135deg, #667eea, #764ba2)';
-                photoItem.innerHTML = '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: white; font-size: 3rem;">🌸</div>';
+                photoItem.innerHTML += '<div style="display: flex; align-items: center; justify-content: center; height: 100%; color: white; font-size: 3rem;">🌸</div>';
             };
             photoItem.appendChild(img);
         }
-        
+
         track.appendChild(photoItem);
     });
-    
+
     console.log('Photos loaded successfully!');
+}
+
+function createFireworkBurst(element) {
+    const burstContainer = document.createElement('div');
+    burstContainer.style.position = 'absolute';
+    burstContainer.style.width = '100%';
+    burstContainer.style.height = '100%';
+    burstContainer.style.top = '0';
+    burstContainer.style.left = '0';
+    burstContainer.style.pointerEvents = 'none';
+    burstContainer.style.zIndex = '10';
+    element.appendChild(burstContainer);
+
+    // Increase number of particles for more spectacular effect
+    for (let i = 0; i < 40; i++) {
+        const particle = document.createElement('div');
+        particle.style.position = 'absolute';
+        particle.style.width = '8px';
+        particle.style.height = '8px';
+        particle.style.background = ['#ff6b6b', '#4ecdc4', '#45b7d1', '#f9ca24', '#6c5ce7', '#fd79a8', '#a29bfe', '#fab1a0'][Math.floor(Math.random() * 8)];
+        particle.style.borderRadius = '50%';
+        particle.style.left = '50%';
+        particle.style.top = '50%';
+        particle.style.transform = 'translate(-50%, -50%)';
+        particle.style.animation = `fireworkBurst 1.5s ease-out forwards`;
+
+        const angle = (i / 40) * 360;
+        const distance = 120 + Math.random() * 80;
+        particle.style.setProperty('--angle', angle + 'deg');
+        particle.style.setProperty('--distance', distance + 'px');
+
+        burstContainer.appendChild(particle);
+
+        setTimeout(() => particle.remove(), 1500);
+    }
+
+    setTimeout(() => burstContainer.remove(), 1500);
 }
 
 function adjustColor(color, amount) {
     return '#' + color.replace(/^#/, '').replace(/../g, color => ('0' + Math.min(255, Math.max(0, parseInt(color, 16) + amount)).toString(16)).substr(-2));
+}
+
+// Shuffle array using Fisher-Yates algorithm
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// Preload images for faster loading
+function preloadImages(imageUrls) {
+    imageUrls.forEach(url => {
+        if (typeof url === 'string' && !url.isPlaceholder) {
+            const img = new Image();
+            img.src = url;
+        }
+    });
 }
 
 // ==================== WISHES ====================
@@ -268,18 +424,31 @@ function loadMusic() {
         });
 }
 
+// ==================== PHOTO SCALING ====================
+function updatePhotoScales() {
+    const photoItems = document.querySelectorAll('.photo-item');
+    const viewportCenter = window.innerWidth / 2;
+
+    photoItems.forEach(item => {
+        const rect = item.getBoundingClientRect();
+        const itemCenter = rect.left + rect.width / 2;
+        const distanceFromCenter = Math.abs(itemCenter - viewportCenter);
+        const maxDistance = viewportCenter; // Maximum distance from center
+
+        // Calculate scale: closer to center = bigger, farther = smaller
+        // Scale from 0.7 (far) to 1.2 (center), but not too big to hide wishes
+        const scale = 1.2 - (distanceFromCenter / maxDistance) * 0.5;
+
+        // Clamp scale between 0.7 and 1.1 to avoid too small or too big
+        const clampedScale = Math.max(0.7, Math.min(1.1, scale));
+
+        item.style.setProperty('--scale', clampedScale);
+    });
+}
+
 // ==================== UTILITIES ====================
-// Pause animation on hover (optional feature)
 document.addEventListener('DOMContentLoaded', function() {
-    const photosTrack = document.getElementById('photosTrack');
-    
-    if (photosTrack) {
-        photosTrack.addEventListener('mouseenter', function() {
-            this.style.animationPlayState = 'paused';
-        });
-        
-        photosTrack.addEventListener('mouseleave', function() {
-            this.style.animationPlayState = 'running';
-        });
-    }
+    // Start photo scaling updates
+    updatePhotoScales();
+    setInterval(updatePhotoScales, 10); // Update every 10ms for smooth scaling
 });

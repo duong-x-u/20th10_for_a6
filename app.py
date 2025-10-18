@@ -1,10 +1,10 @@
-from flask import Flask, render_template, jsonify
+from flask import Flask, render_template, jsonify, send_from_directory
 from whitenoise import WhiteNoise
 import os
 import random
 
 app = Flask(__name__)
-app.wsgi_app = WhiteNoise(app.wsgi_app)
+app.wsgi_app = WhiteNoise(app.wsgi_app, max_age=31536000)  # Cache static files for 1 year
 
 # Danh sách lời chúc (bạn có thể thêm nhiều hơn)
 WISHES = [
@@ -12,9 +12,9 @@ WISHES = [
     "20/10 - Ngày của những bông hoa đẹp nhất! Chúc các bạn luôn hạnh phúc! 💐",
     "Chúc các chị em luôn vui vẻ, thành công và may mắn nhe! 🌺",
     "Gửi đến các Sò nữ những lời chúc tốt đẹp nhất nhân ngày 20/10! 🌷",
-    "Chúc các bạn nữ luôn tự tin, mạnh mẽ và tỏa sáng! ✨",
+    "Chúc các bạn Cọp cái luôn tự tin, mạnh mẽ và tỏa sáng! ✨",
     "20/10 - Chúc các bạn nữ trong lớp luôn xinh đẹp và thành công rực rỡ! 🌹",
-    "Chúc các bạn nữ một ngày 20/10 thật ý nghĩa và đáng nhớ! 🎀",
+    "Chúc các rắn độc nữ một ngày 20/10 thật ý nghĩa và đáng nhớ! 🎀",
     "Chúc các bạn luôn là những bông hoa đẹp nhất trong vườn đời! 🌼",
     "Gửi đến các bạn nữ lời chúc ngọt ngào như tiếng cười của các bạn! 💖",
     "20/10 - Chúc các bạn Sò nữ luôn vui vẻ, yêu đời và đạt được mọi ước mơ! 🌟",
